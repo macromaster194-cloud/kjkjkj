@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Auto Shorts Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Optional Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg-dark: #050816;
+      --bg-card: rgba(16, 24, 40, 0.95);
+      --bg-input: #0b1020;
+      --accent: #6366f1;
+      --accent-soft: rgba(99, 102, 241, 0.15);
+      --accent-strong: #4f46e5;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --error: #f97373;
+      --success: #22c55e;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, #1e293b 0, transparent 55%),
+        radial-gradient(circle at top right, #4f46e5 0, transparent 55%),
+        radial-gradient(circle at bottom, #0f172a 0, #020617 70%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(
+          135deg,
+          rgba(148, 163, 184, 0.12),
+          rgba(15, 23, 42, 0.9)
+        ),
+        #020617;
+      border-radius: 28px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow:
+        0 24px 60px rgba(15, 23, 42, 0.8),
+        0 0 0 1px rgba(15, 23, 42, 0.4);
+      padding: 24px;
+      backdrop-filter: blur(22px);
+    }
+
+    @media (min-width: 900px) {
+      .app-shell {
+        padding: 32px 36px;
+      }
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--accent-soft);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #22c55e 0, #22c55e 40%, transparent 70%);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    }
+
+    .title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-gradient {
+      background: linear-gradient(to right, #e5e7eb, #a5b4fc, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 540px;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip span {
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.05fr 1.25fr;
+      gap: 22px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 18px 18px 16px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at top right,
+        rgba(99, 102, 241, 0.13),
+        transparent 60%
+      );
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #a5b4fc, #4f46e5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: white;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.9);
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .input-row {
+        flex-direction: column;
+      }
+    }
+
+    .input {
+      flex: 1;
+      background: var(--bg-input);
+      border-radius: 16px;
+      padding: 11px 12px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease;
+    }
+
+    .input::placeholder {
+      color: #6b7280;
+    }
+
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.7);
+      background: #020617;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .btn-primary {
+      border-radius: 16px;
+      border: none;
+      padding: 0 18px;
+      background: radial-gradient(circle at top left, #a5b4fc, #4f46e5);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      box-shadow:
+        0 12px 24px rgba(55, 65, 81, 0.7),
+        0 0 20px rgba(79, 70, 229, 0.75);
+      white-space: nowrap;
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        filter 0.12s ease;
+    }
+
+    .btn-primary span {
+      font-size: 1.05rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow:
+        0 20px 40px rgba(15, 23, 42, 0.9),
+        0 0 28px rgba(79, 70, 229, 0.9);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow:
+        0 8px 18px rgba(15, 23, 42, 0.9),
+        0 0 18px rgba(79, 70, 229, 0.9);
+    }
+
+    .btn-primary[disabled] {
+      opacity: 0.65;
+      cursor: wait;
+      box-shadow: none;
+      transform: none;
+      filter: none;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.9);
+    }
+
+    .status-dot.idle {
+      background: #6b7280;
+      box-shadow: none;
+    }
+
+    .status-dot.success {
+      background: var(--success);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .status-dot.error {
+      background: var(--error);
+      box-shadow: 0 0 10px rgba(248, 113, 113, 0.9);
+    }
+
+    .status-text {
+      color: var(--text-muted);
+    }
+
+    .status-text strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .helper-link {
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      cursor: pointer;
+    }
+
+    .shorts-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .placeholder-text {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .short-card {
+      background: radial-gradient(
+        circle at top,
+        rgba(99, 102, 241, 0.2),
+        rgba(15, 23, 42, 0.95)
+      );
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .short-thumb {
+      position: relative;
+      border-radius: 12px;
+      background: linear-gradient(to bottom, #1d4ed8, #4b5563, #020617);
+      padding-top: 177%; /* 9:16 */
+      overflow: hidden;
+    }
+
+    .short-thumb-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #e5e7eb;
+    }
+
+    .short-thumb-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .short-thumb-time {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      color: #e5e7eb;
+    }
+
+    .short-meta {
+      font-size: 0.78rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .short-title {
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .short-details {
+      color: var(--text-muted);
+      font-size: 0.74rem;
+    }
+
+    .short-actions {
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.12s ease, border-color 0.12s ease,
+        transform 0.12s ease;
+    }
+
+    .btn-ghost span {
+      font-size: 11px;
+      color: var(--accent);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 1);
+      border-color: var(--accent);
+      transform: translateY(-0.5px);
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .note strong {
+      color: #e5e7eb;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.75rem;
+    }
+
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+    }
+
+    .pill b {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .footer {
+      margin-top: 16px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer span.highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header">
+      <div class="title-block">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Auto-Shorts Engine · BETA
+        </div>
+        <h1 class="title">
+          Auto
+          <span class="title-gradient">Shorts Generator</span>
+        </h1>
+        <p class="subtitle">
+          Paste a long-form video link and get multiple 1-minute,
+          copyright-safe, subtitle-ready short videos — fully edited for
+          YouTube Shorts, TikTok and Reels.
+        </p>
+      </div>
+      <div class="header-actions">
+        <div class="chip-row">
+          <div class="chip"><span>AI</span> Clip Detection</div>
+          <div class="chip"><span>9:16</span> Vertical Exports</div>
+          <div class="chip"><span>CC</span> Auto Subtitles</div>
+        </div>
+        <div>Built for <strong>faceless & creator channels</strong>.</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- LEFT: INPUT / CONTROLS -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <div class="card-title-icon">✂️</div>
+              Input Video Link
+            </div>
+            <div class="card-subtitle">
+              Paste a video URL and let the tool do the rest.
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="videoUrl" class="form-label">Video URL</label>
+          <div class="input-row">
+            <input
+              id="videoUrl"
+              class="input"
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=example"
+            />
+            <button id="generateBtn" class="btn-primary">
+              <span>⚡</span> Generate Shorts
+            </button>
+          </div>
+          <p class="hint">
+            Supports most public video links. Make sure you have the right to
+            use this content.
+          </p>
+        </div>
+
+        <div class="status-row">
+          <div class="status-indicator">
+            <div id="statusDot" class="status-dot idle"></div>
+            <span id="statusText" class="status-text">
+              <strong>Idle</strong> · Waiting for a video link.
+            </span>
+          </div>
+          <div>
+            <span class="helper-link" id="demoFill">Use demo link</span>
+          </div>
+        </div>
+
+        <p class="note">
+          <strong>Note:</strong> This HTML is just the frontend. Connect the
+          <code>generateShorts()</code> function in JavaScript to your backend
+          / AI service that actually processes the video.
+        </p>
+      </section>
+
+      <!-- RIGHT: OUTPUT PREVIEW -->
+      <section class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <div class="card-title-icon">🎬</div>
+              Generated Shorts
+            </div>
+            <div class="card-subtitle">
+              Your 1-minute clips will appear here once processing is done.
+            </div>
+          </div>
+        </div>
+
+        <div id="shortsContainer">
+          <p class="placeholder-text">
+            No shorts generated yet. Paste a video link on the left and click
+            <strong>Generate Shorts</strong>.
+          </p>
+        </div>
+
+        <div class="pill-list">
+          <div class="pill"><b>Auto:</b> Clip selection</div>
+          <div class="pill"><b>Auto:</b> Subtitles</div>
+          <div class="pill"><b>Auto:</b> 9:16 format</div>
+          <div class="pill"><b>Safe:</b> Transformative editing</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        This UI is a template. Connect it to your
+        <span class="highlight">video-processing API</span> to make it fully
+        functional.
+      </div>
+      <div>Step 1: Paste link · Step 2: Click generate · Step 3: Download shorts</div>
+    </footer>
+  </div>
+
+  <script>
+    const generateBtn = document.getElementById("generateBtn");
+    const videoUrlInput = document.getElementById("videoUrl");
+    const statusDot = document.getElementById("statusDot");
+    const statusText = document.getElementById("statusText");
+    const shortsContainer = document.getElementById("shortsContainer");
+    const demoFill = document.getElementById("demoFill");
+
+    // Fill demo link
+    demoFill.addEventListener("click", () => {
+      videoUrlInput.value = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+      videoUrlInput.focus();
+    });
+
+    // Simple URL validation
+    function isValidUrl(url) {
+      try {
+        new URL(url);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function setStatus(state, message) {
+      statusDot.classList.remove("idle", "success", "error");
+      statusDot.classList.add(state);
+      statusText.innerHTML = message;
+    }
+
+    // MAIN HANDLER
+    generateBtn.addEventListener("click", async () => {
+      const url = videoUrlInput.value.trim();
+
+      if (!url || !isValidUrl(url)) {
+        setStatus(
+          "error",
+          "<strong>Error</strong> · Please enter a valid video URL."
+        );
+        videoUrlInput.focus();
+        return;
+      }
+
+      generateBtn.disabled = true;
+      setStatus(
+        "accent",
+        "<strong>Processing…</strong> · Analyzing and generating multiple shorts."
+      );
+      statusDot.classList.remove("idle", "success", "error");
+      // fallback color when using "accent" pseudo-state
+      statusDot.style.background = "var(--accent)";
+      statusDot.style.boxShadow = "0 0 10px rgba(99, 102, 241, 0.9)";
+
+      // Clear old shorts
+      shortsContainer.innerHTML =
+        '<p class="placeholder-text">Processing your video… this is a simulated preview. Connect this UI to a backend for real results.</p>';
+
+      // 🔧 TODO: Replace this simulated delay + mock data
+      // with a real API call to your backend:
+      //
+      // const response = await fetch("/api/generate-shorts", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ videoUrl: url })
+      // });
+      // const data = await response.json();
+      //
+      // Then render `data.shorts` instead of mockShorts.
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      const mockShorts = [
+        {
+          id: 1,
+          title: "Hook: The moment everything changes",
+          duration: "0:54",
+          hook: "Crazy twist at 00:37",
+          value: "High emotion · Perfect hook",
+        },
+        {
+          id: 2,
+          title: "This 45-second breakdown is gold",
+          duration: "0:45",
+          hook: "Big reveal in 5 seconds",
+          value: "High value · Educational",
+        },
+        {
+          id: 3,
+          title: "People will replay this part",
+          duration: "0:59",
+          hook: "Strong story arc",
+          value: "Retention-focused · Viral-ready",
+        },
+      ];
+
+      renderShorts(mockShorts);
+      setStatus(
+        "success",
+        "<strong>Ready</strong> · Generated preview shorts. Connect your backend for real clips."
+      );
+      generateBtn.disabled = false;
+    });
+
+    function renderShorts(shorts) {
+      if (!shorts || shorts.length === 0) {
+        shortsContainer.innerHTML =
+          '<p class="placeholder-text">No shorts generated yet.</p>';
+        return;
+      }
+
+      const grid = document.createElement("div");
+      grid.className = "shorts-list";
+
+      shorts.forEach((short, index) => {
+        const card = document.createElement("article");
+        card.className = "short-card";
+
+        card.innerHTML = `
+          <div class="short-thumb">
+            <div class="short-thumb-badge">
+              <span class="short-thumb-badge-dot"></span>
+              Clip #${index + 1}
+            </div>
+            <div class="short-thumb-time">${short.duration}</div>
+          </div>
+          <div class="short-meta">
+            <div class="short-title">${short.title}</div>
+            <div class="short-details">
+              ${short.hook}<br />
+              <span>${short.value}</span>
+            </div>
+          </div>
+          <div class="short-actions">
+            <button class="btn-ghost">
+              <span>⬇</span> Download
+            </button>
+            <button class="btn-ghost">
+              <span>👁</span> Preview
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      shortsContainer.innerHTML = "";
+      shortsContainer.appendChild(grid);
+    }
+  </script>
+</body>
+</html>
